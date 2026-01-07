@@ -4,12 +4,18 @@
 const refreshBtn = document.getElementById("refresh-btn");
 const vehiclesDiv = document.getElementById("vehicles");
 const canvas = document.getElementById("canvas");
+const canvasColor = "rgba(252, 244, 209, 1)";
 const ctx = canvas.getContext("2d");
+// Page load routine
 refreshBtn.addEventListener("click", fetchData);
+canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
+canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
+resetCanvas();
+fetchData();
 
 // San Francisco border coordinates
-const NORTH_BORDER = 37.833;
-const SOUTH_BORDER = 37.708;
+const NORTH_BORDER = 37.830;
+const SOUTH_BORDER = 37.704;
 const EAST_BORDER = -122.359;
 const WEST_BORDER = -122.517;
 
@@ -18,6 +24,57 @@ function calcX(longitude) {
 }
 function calcY(latitude) {
     return 1 - (latitude - SOUTH_BORDER) / (NORTH_BORDER - SOUTH_BORDER)
+}
+function radians(degrees) {
+    return Math.PI * degrees / 180.0;
+}
+function resetCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = canvasColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+function drawArrow(x, y, theta = 0, size = 5) {
+    ctx.beginPath();
+    let xt = x, yt = y;
+    ctx.moveTo(xt, yt);
+    xt += size * Math.cos(theta + 3.0*Math.PI/4.0);
+    yt -= size * Math.sin(theta + 3.0*Math.PI/4.0);
+    ctx.lineTo(xt, yt);
+    xt += size/1.5 * Math.cos(theta);
+    yt -= size/1.5 * Math.sin(theta);
+    ctx.lineTo(xt, yt);
+    xt -= size * Math.cos(theta + 3.0*Math.PI/4.0);
+    yt += size * Math.sin(theta + 3.0*Math.PI/4.0);
+    ctx.lineTo(xt, yt);
+    xt += size * Math.cos(theta - 3.0*Math.PI/4.0);
+    yt -= size * Math.sin(theta - 3.0*Math.PI/4.0);
+    ctx.lineTo(xt, yt);
+    xt -= size/1.5 * Math.cos(theta);
+    yt += size/1.5 * Math.sin(theta);
+    ctx.lineTo(xt, yt);
+    xt -= size * Math.cos(theta - 3.0*Math.PI/4.0);
+    yt += size * Math.sin(theta - 3.0*Math.PI/4.0);
+    ctx.lineTo(xt, yt);
+    ctx.closePath();
+    ctx.fillStyle = "rgb(128 0 0)";
+    ctx.fill();
+}
+function drawText(x, y, text, theta = 0, size = 5) {
+    const fontsize = size * 2;
+    ctx.font = `normal ${fontsize}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const metrics = ctx.measureText(text);
+    const xcorr = size * 0.9;
+    const ycorr = size * 0.9;
+    const xl = x - ((metrics.width/2.0 + xcorr) * Math.cos(theta));
+    const yl = y + ((metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent)/2.0 + ycorr) * Math.sin(theta);
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.fillText(text, xl, yl);
+}
+function drawIcon(x, y, theta, size, label) {
+    drawArrow(x, y, theta, size);
+    drawText(x, y, label, theta, size);
 }
 
 async function fetchData() {
@@ -33,14 +90,17 @@ async function fetchData() {
     } catch (e) {
         alert(e);
     }
+    // Resize canvas
+    canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
+    canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
     // Draw on canvas
     if (canvas.getContext) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgb(128 0 0)";
+        resetCanvas();
         for (const [_, vehicle] of Object.entries(vehicles)) {
-            let x = calcX(vehicle.longitude) * canvas.width;
-            let y = calcY(vehicle.latitude) * canvas.height;
-            ctx.fillRect(x, y, 2, 2);
+            const x = calcX(vehicle.longitude) * canvas.width;
+            const y = calcY(vehicle.latitude) * canvas.height;
+            const theta = radians(-(vehicle.bearing + 90.0));
+            drawIcon(x, y, theta, 6, vehicle.route_id);
         }
     } else {
 

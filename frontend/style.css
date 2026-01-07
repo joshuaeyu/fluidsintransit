@@ -1,6 +1,7 @@
 body {
     font-family: sans-serif;
-    background-color: lightcyan;
+    background-color: rgb(224, 246, 255);
+    text-align: center;
 }
 
 canvas {
