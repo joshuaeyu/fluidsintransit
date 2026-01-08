@@ -6,9 +6,21 @@
     </head>
     <body>
         <h2>Hello! This is a realtime visualization of San Francisco's MUNI fleet.</h2>
-        <div>
+        <fieldset id="user-input">
+            <label>
+                <input type="checkbox" name="vehicletype" id="bus" value="bus" checked>
+                Buses
+            </label>
+            <label>
+                <input type="checkbox" name="vehicletype" id="metro" value="metro" checked>
+                Metro light rail
+            </label>
+            <label>
+                <input type="checkbox" name="vehicletype" id="cableway" value="cableway" checked>
+                Cable cars
+            </label>
             <button type="button" id="refresh-btn">Update</button>
-        </div>
+        </fieldset>
         <br>
         <div id="vehicles">
             <canvas id="canvas" width="600" height="550">

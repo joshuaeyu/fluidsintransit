@@ -2,7 +2,16 @@
 
 // Document elements
 const refreshBtn = document.getElementById("refresh-btn");
-const vehiclesDiv = document.getElementById("vehicles");
+const vehicleTypeCheckboxes = {
+    bus: document.getElementById("bus"),
+    metro: document.getElementById("metro"),
+    cableway: document.getElementById("cableway"),
+};
+const VehicleType = Object.freeze({
+    Bus: Symbol("bus"),
+    Metro: Symbol("metro"),
+    Cableway: Symbol("cableway")
+})
 const canvas = document.getElementById("canvas");
 const canvasColor = "rgba(252, 244, 209, 1)";
 const ctx = canvas.getContext("2d");
@@ -15,7 +24,7 @@ fetchData();
 
 // San Francisco border coordinates
 const NORTH_BORDER = 37.830;
-const SOUTH_BORDER = 37.704;
+const SOUTH_BORDER = 37.700;
 const EAST_BORDER = -122.359;
 const WEST_BORDER = -122.517;
 
@@ -28,12 +37,15 @@ function calcY(latitude) {
 function radians(degrees) {
     return Math.PI * degrees / 180.0;
 }
+function isAlpha(char) {
+    return /^[A-Z]/.test(char);
+}
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = canvasColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-function drawArrow(x, y, theta = 0, size = 5) {
+function drawArrow(x, y, theta = 0, size = 5, color = "rgb(0, 0, 0)") {
     ctx.beginPath();
     let xt = x, yt = y;
     ctx.moveTo(xt, yt);
@@ -56,7 +68,7 @@ function drawArrow(x, y, theta = 0, size = 5) {
     yt += size * Math.sin(theta - 3.0*Math.PI/4.0);
     ctx.lineTo(xt, yt);
     ctx.closePath();
-    ctx.fillStyle = "rgb(128 0 0)";
+    ctx.fillStyle = color;
     ctx.fill();
 }
 function drawText(x, y, text, theta = 0, size = 5) {
@@ -72,9 +84,18 @@ function drawText(x, y, text, theta = 0, size = 5) {
     ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.fillText(text, xl, yl);
 }
-function drawIcon(x, y, theta, size, label) {
-    drawArrow(x, y, theta, size);
+function drawIcon(x, y, theta, size, color, label) {
+    drawArrow(x, y, theta, size, color);
     drawText(x, y, label, theta, size);
+}
+function getVehicleType(vehicle) {
+    if (['CA', 'PH', 'PM'].indexOf(vehicle.route_id) !== -1) {
+        return VehicleType.Cableway;
+    } else if (isAlpha(vehicle.route_id[0])) {
+        return VehicleType.Metro;
+    } else {
+        return VehicleType.Bus;
+    }
 }
 
 async function fetchData() {
@@ -97,10 +118,31 @@ async function fetchData() {
     if (canvas.getContext) {
         resetCanvas();
         for (const [_, vehicle] of Object.entries(vehicles)) {
+            let color;
+            switch (getVehicleType(vehicle)) {
+                case VehicleType.Bus:
+                    if (!vehicleTypeCheckboxes.bus.checked) {
+                        continue;
+                    }
+                    color = "green";
+                    break;
+                case VehicleType.Metro:
+                    if (!vehicleTypeCheckboxes.metro.checked) {
+                        continue;
+                    }
+                    color = "blue";
+                    break;
+                case VehicleType.Cableway:
+                    if (!vehicleTypeCheckboxes.cableway.checked) {
+                        continue;
+                    }
+                    color = "red";
+                    break;
+            }
             const x = calcX(vehicle.longitude) * canvas.width;
             const y = calcY(vehicle.latitude) * canvas.height;
             const theta = radians(-(vehicle.bearing + 90.0));
-            drawIcon(x, y, theta, 6, vehicle.route_id);
+            drawIcon(x, y, theta, 6, color, vehicle.route_id);
         }
     } else {
 

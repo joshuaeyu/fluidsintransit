@@ -4,6 +4,10 @@ body {
     text-align: center;
 }
 
+fieldset {
+    border: none;
+}
+
 canvas {
     border: 1px solid black;
 }
