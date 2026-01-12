@@ -16,14 +16,15 @@ const canvas = document.getElementById("canvas");
 const canvasColor = "rgba(252, 244, 209, 1)";
 const ctx = canvas.getContext("2d");
 // Page load routine
-refreshBtn.addEventListener("click", fetchData);
+refreshBtn.addEventListener("click", () => draw(fetchVehiclePositions()));
 canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
 canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
 resetCanvas();
-fetchData();
+let vehicles = fetchVehiclePositions();
+draw(vehicles);
 
 // San Francisco border coordinates
-const NORTH_BORDER = 37.830;
+const NORTH_BORDER = 37.833;
 const SOUTH_BORDER = 37.700;
 const EAST_BORDER = -122.359;
 const WEST_BORDER = -122.517;
@@ -97,20 +98,7 @@ function getVehicleType(vehicle) {
         return VehicleType.Bus;
     }
 }
-
-async function fetchData() {
-    // Fetch vehicle positions
-    let vehicles;
-    try {
-        const request = new Request("http://localhost:8000/live");
-        const response = await fetch(request);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status} ${response.statusText}`);
-        }
-        vehicles = await response.json();
-    } catch (e) {
-        alert(e);
-    }
+function draw(vehicles) {
     // Resize canvas
     canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
     canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
@@ -144,23 +132,21 @@ async function fetchData() {
             const theta = radians(-(vehicle.bearing + 90.0));
             drawIcon(x, y, theta, 6, color, vehicle.route_id);
         }
-    } else {
+    }
+}
 
+export async function fetchVehiclePositions() {
+    // Fetch vehicle positions
+    try {
+        const request = new Request("http://localhost:8000/live");
+        const response = await fetch(request);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status} ${response.statusText}`);
+        }
+        vehicles = await response.json();
+    } catch (e) {
+        alert(e);
     }
 
-    // fetch("http://localhost:8000/live")
-    //     .then((response) => {
-    //         if (!response.ok) {
-    //             throw new Error(`Could not open ${url}.`);
-    //         }
-    //         return response.text();
-    //     })
-    //     .then((text) => {
-    //         const p = document.createElement("p");
-    //         p.textContent = text;
-    //         document.body.appendChild(p);
-    //     })
-    //     .catch((error) => {
-    //         alert(error);
-    //     });
+    return vehicles;
 }
