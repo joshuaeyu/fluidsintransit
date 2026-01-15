@@ -9,7 +9,7 @@ fn vertex_main (
     @location(0) position: vec4f,
     @location(1) uv: vec2f
 ) -> VertexOut {
-    return VertexOut(uv, position);
+    return VertexOut(vec2f(uv.x, 1.0-uv.y), position);
 }
 
 // Fragment shader
