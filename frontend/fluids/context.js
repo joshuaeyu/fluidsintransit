@@ -28,8 +28,10 @@ class WebGpuContext {
         this.context = this.canvas.getContext("webgpu");
         this.context.configure({
             device: this.device,
-            format: navigator.gpu.getPreferredCanvasFormat(),
+            // format: navigator.gpu.getPreferredCanvasFormat(),
             alphaMode: "premultiplied",
+            format: "rgba16float",
+            toneMapping: { mode: "extended" },
         });
     }
 }

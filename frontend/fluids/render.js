@@ -135,7 +135,8 @@ export class RenderApp {
                 entryPoint: "fragment_main",
                 targets: [
                     {
-                        format: navigator.gpu.getPreferredCanvasFormat(),
+                        format: "rgba16float",
+                        // format: navigator.gpu.getPreferredCanvasFormat(),
                     },
                 ],
             },
