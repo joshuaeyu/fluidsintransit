@@ -1,49 +1,50 @@
 // import { fetchVehiclePositions } from "./app.js"
-// import { initWebGPU } from "./webgpu.js"
-// import { initSimulationPipelines } from "./fluids.js"
 import { webGpuContext } from "./fluids/context.js";
-import { SimulationApp } from "./fluids/simulation.js";
 import { RenderApp } from "./fluids/render.js";
+import { SimulationApp } from "./fluids/simulation.js";
+import { delay } from "./fluids/util.js";
 
 const canvas = document.getElementById("canvas");
-await webGpuContext.init(canvas);
+await webGpuContext.init(canvas, true);
 
-const simulationSettings = {
+const settings = {
     M: 1000, // Doesn't include boundary
     N: 1000, // Doesn't include boundary
-    dt: 0.001,
-    diffusivity: 0.5,
+    dt: 1,
+    diffusivity: 0.000001,
     viscosity: 1,
+    hdr: true,
 };
 
-const renderSettings = {
-    M: 1000, // Doesn't include boundary
-    N: 1000, // Doesn't include boundary
-};
+const simulator = await SimulationApp.build(settings);
+const renderer = await RenderApp.build(settings);
 
-const simulator = await SimulationApp.build(simulationSettings);
-const renderer = await RenderApp.build(renderSettings);
-
-const data = new Float32Array((simulationSettings.M+2) * (simulationSettings.N+2));
-for (let i = 0; i < simulationSettings.N+2; i++) {
-    for (let j = 0; j < simulationSettings.M+2; j++) {
-        const idx = i * (simulationSettings.M+2) + j;
-        if (0.47*simulationSettings.M < i && i < 0.53*simulationSettings.M) {
-            data[idx] = 5;
-        } else {
-            data[idx] = 0;
+const densitySource = new Float32Array((settings.M+2) * (settings.N+2));
+for (let i = 0; i < settings.N+2; i++) {
+    for (let j = 0; j < settings.M+2; j++) {
+        const idx = i * (settings.M+2) + j;
+        if (0.01*settings.M < j && j < 0.05*settings.M && 0.01*settings.N < i && i < 0.05*settings.N) {
+            densitySource[idx] = 5;
+        } else if (0.65*settings.M < j && j < 0.70*settings.M && 0.65*settings.N < i && i < 0.70*settings.N) {
+            densitySource[idx] = 10;
         }
     }
 }
-
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+const velocitySource = new Float32Array((settings.M+2) * (settings.N+2) * 2);
+for (let i = 0; i < settings.N+2; i++) {
+    for (let j = 0; j < settings.M+2; j++) {
+        const idx = i * (settings.M+2) + j;
+        velocitySource[2*idx] = -0.0003;
+        velocitySource[2*idx+1] = -0.0001;
+    }
 }
 
-await simulator.addSource(simulator.resources.densityTextureArray, 0, data);
-for (let i = 0; i < 1000; i++) {
+await simulator.addSourceDensity(densitySource);
+await simulator.addSourceVelocity(velocitySource);
+for (let i = 0; i < 10000; i++) {
     await simulator.densityStep();
+    // await simulator.velocityStep();
     const tv = await simulator.getDensityOutputTextureView();
     renderer.render(tv);
-    await delay(10);
+    await delay(1);
 }

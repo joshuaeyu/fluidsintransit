@@ -16,12 +16,14 @@ override N: f32;
 fn divergence(
     fragIn: VertexOut
 ) -> @location(0) f32 {
-    let i = fragIn.position.x;
-    let j = fragIn.position.y;
-    let u_e = textureSample(w_tex, tex_sampler, vec2(i,j+1)).x;
-    let u_w = textureSample(w_tex, tex_sampler, vec2(i,j-1)).x;
-    let v_n = textureSample(w_tex, tex_sampler, vec2(i+1,j)).y;
-    let v_s = textureSample(w_tex, tex_sampler, vec2(i-1,j)).y;
+    let i = fragIn.uv.x;
+    let j = fragIn.uv.y;
+    let di = 1 / (M + 2);
+    let dj = 1 / (N + 2);
+    let u_e = textureSample(w_tex, tex_sampler, vec2(i+di,j)).x;
+    let u_w = textureSample(w_tex, tex_sampler, vec2(i-di,j)).x;
+    let v_n = textureSample(w_tex, tex_sampler, vec2(i,j+dj)).y;
+    let v_s = textureSample(w_tex, tex_sampler, vec2(i,j-dj)).y;
     let result = -0.5 * (u_e - u_w + v_n - v_s) / N;
     return result;
 }

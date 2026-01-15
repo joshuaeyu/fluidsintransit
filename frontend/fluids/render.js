@@ -135,8 +135,7 @@ export class RenderApp {
                 entryPoint: "fragment_main",
                 targets: [
                     {
-                        format: "rgba16float",
-                        // format: navigator.gpu.getPreferredCanvasFormat(),
+                        format: this.settings.hdr ? "rgba16float" : navigator.gpu.getPreferredCanvasFormat(),
                     },
                 ],
             },
@@ -146,6 +145,6 @@ export class RenderApp {
             }),
         };
 
-        this.#renderPipeline = webGpuContext.device.createRenderPipeline(pipelineDescriptor);
+        this.#renderPipeline = await webGpuContext.device.createRenderPipelineAsync(pipelineDescriptor);
     }
 }

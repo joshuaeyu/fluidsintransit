@@ -2,9 +2,11 @@ class WebGpuContext {
     canvas;
     device;
     context;
+    hdr;
 
-    async init(canvas) {
+    async init(canvas, hdr = true) {
         this.canvas = canvas;
+        this.hdr = hdr;
         await this.#initWebGPU();
     }
 
@@ -26,13 +28,20 @@ class WebGpuContext {
         } 
 
         this.context = this.canvas.getContext("webgpu");
-        this.context.configure({
-            device: this.device,
-            // format: navigator.gpu.getPreferredCanvasFormat(),
-            alphaMode: "premultiplied",
-            format: "rgba16float",
-            toneMapping: { mode: "extended" },
-        });
+        if (this.hdr) {
+            this.context.configure({
+                device: this.device,
+                alphaMode: "premultiplied",
+                format: "rgba16float",
+                toneMapping: { mode: "extended" },
+            });
+        } else {
+            this.context.configure({
+                device: this.device,
+                format: navigator.gpu.getPreferredCanvasFormat(),
+                alphaMode: "premultiplied",
+            });
+        }
     }
 }
 
