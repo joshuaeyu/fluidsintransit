@@ -13,15 +13,15 @@ const VehicleType = Object.freeze({
     Cableway: Symbol("cableway")
 })
 const canvas = document.getElementById("canvas");
-const canvasColor = "rgba(252, 244, 209, 1)";
-const ctx = canvas.getContext("2d");
-// Page load routine
-refreshBtn.addEventListener("click", () => draw(fetchVehiclePositions()));
 canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
 canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
-resetCanvas();
-let vehicles = fetchVehiclePositions();
-draw(vehicles);
+// const canvasColor = "rgba(252, 244, 209, 1)";
+// const ctx = canvas.getContext("2d");
+// Page load routine
+// refreshBtn.addEventListener("click", () => draw(fetchVehiclePositions()));
+// resetCanvas();
+// let vehicles = fetchVehiclePositions();
+// draw(vehicles);
 
 // San Francisco border coordinates
 const NORTH_BORDER = 37.833;
@@ -29,13 +29,13 @@ const SOUTH_BORDER = 37.700;
 const EAST_BORDER = -122.359;
 const WEST_BORDER = -122.517;
 
-function calcX(longitude) {
+export function calcX(longitude) {
     return (longitude - WEST_BORDER) / (EAST_BORDER - WEST_BORDER)
 }
-function calcY(latitude) {
+export function calcY(latitude) {
     return 1 - (latitude - SOUTH_BORDER) / (NORTH_BORDER - SOUTH_BORDER)
 }
-function radians(degrees) {
+export function radians(degrees) {
     return Math.PI * degrees / 180.0;
 }
 function isAlpha(char) {
@@ -137,6 +137,7 @@ function draw(vehicles) {
 
 export async function fetchVehiclePositions() {
     // Fetch vehicle positions
+    let vehicles;
     try {
         const request = new Request("http://localhost:8000/live");
         const response = await fetch(request);
@@ -145,7 +146,7 @@ export async function fetchVehiclePositions() {
         }
         vehicles = await response.json();
     } catch (e) {
-        alert(e);
+        throw e;
     }
 
     return vehicles;

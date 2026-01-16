@@ -107,7 +107,7 @@ export class SimulationApp {
         const c = 1 + 4 * a;
         this.resources.uniformValues.set([a, c]);
         webGpuContext.device.queue.writeBuffer(this.resources.uniformBuffer, 0, this.resources.uniformValues);
-        for (let k = 0; k < 100; k++) {
+        for (let k = 0; k < 40; k++) {
             // - diffuse: d2 constant; d0 -> d1, d1 -> d0, ...
             const diffusionEncoder = advectDiffuseCommandEncoder.beginRenderPass(this.#renderPassDescriptors.density[1-this.densityOutIdx]); // Target texture
             diffusionEncoder.setPipeline(this.#pipelines.jacobi); // Operation
