@@ -103,8 +103,8 @@ export class SimulationApp {
         // setbndEncoder.end();
 
         // Diffusion
-        const a = this.settings.dt * this.settings.diffusivity * this.settings.M * this.settings.N;
-        const c = 1 + 4 * a;
+        const a = this.settings.dt * this.settings.dissipation * this.settings.diffusivity * this.settings.M * this.settings.N;
+        const c = 1 + 4 * a / this.settings.dissipation;
         this.resources.uniformValues.set([a, c]);
         webGpuContext.device.queue.writeBuffer(this.resources.uniformBuffer, 0, this.resources.uniformValues);
         for (let k = 0; k < 40; k++) {

@@ -13,7 +13,8 @@ const settings = {
     M: 1000, // Doesn't include boundary
     N: 1000, // Doesn't include boundary
     dt: 1,
-    diffusivity: 0.000001,
+    diffusivity: 0.0000001,
+    dissipation: 0.995,
     viscosity: 1,
     hdr: false,
 };
