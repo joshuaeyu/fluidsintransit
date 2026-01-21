@@ -1,6 +1,7 @@
 import pathlib
 import pickle as pkl
 import time
+from typing import Sequence
 
 from google.protobuf.message import Message
 from google.transit import gtfs_realtime_pb2
@@ -12,11 +13,9 @@ from ..db.models import VehiclePosition
 from ..util.util import read_api_key
 
 CACHE_PATH: pathlib.Path = pathlib.Path(__file__).parents[2].joinpath("data/cache.pkl").resolve()
-FETCH_INTERVAL: int = 60
+FETCH_INTERVAL: int = 10
 MAX_NUM_RECORDS: int = 1_000_000
 BATCH_ID: str
-
-current_vehicles: list[VehiclePosition] = []
 
 def fetch_vehicle_positions() -> Message:
   # HTTP GET
@@ -52,6 +51,18 @@ def convert_msg_to_objects(message: Message) -> list[VehiclePosition]:
       vehicles.append(vehicle)
   return vehicles
 
+def convert_list_to_dict(vehicles: Sequence[VehiclePosition]):
+  return {vp.vehicle_id: vp for vp in vehicles}
+
+def calc_apparent_velocity(vehicles_curr: dict[str, VehiclePosition], vehicles_prev: dict[str, VehiclePosition]):
+  for vp_prev_id, vp_prev in vehicles_prev.items():
+    vp_curr = vehicles_curr.get(vp_prev_id)
+    if vp_curr:
+      dt = vp_curr.timestamp - vp_prev.timestamp
+      if dt > 0:
+        vp_curr.apparent_velocity_lat = (vp_prev.latitude - vp_curr.latitude) / dt
+        vp_curr.apparent_velocity_long = (vp_prev.longitude - vp_curr.longitude) / dt
+
 def save_to_cache(vehicles: dict[str, VehiclePosition]) -> None:
   with open(CACHE_PATH, 'wb') as file:
     pkl.dump(vehicles, file)
@@ -65,7 +76,7 @@ def init() -> None:
   BATCH_ID = str(int(time.time()))
   create_db_and_tables()
 
-# While running, fetch positions every 60 seconds and update database
+# While running, fetch positions every FETCH_INTERVAL seconds and update database and cache
 def run() -> None:
   while True:
     # Fetch vehicle positions
@@ -73,20 +84,23 @@ def run() -> None:
     vehicles = convert_msg_to_objects(msg)
     # Update database and cache
     if vehicles:
-      current_vehicles = vehicles
+      current_vehicles = {}
       # Update database
       with Session() as session:
-        session.add_all(current_vehicles)
+        session.add_all(vehicles)
         session.commit()
-        for vp in session.scalars(select(VehiclePosition)).all():
-          print(vp.__dict__)
+        session.refresh
+        # for vp in session.scalars(select(VehiclePosition)).all():
+        #   print(vp.__dict__)
         count = session.execute(select(func.count(VehiclePosition.id))).scalar_one()
         print(f"VehiclePosition database size: {count}")
         if count > MAX_NUM_RECORDS:
           print(f"The number of VehiclePosition records has exceeded the configured max of {MAX_NUM_RECORDS}.")
+        current_vehicles = convert_list_to_dict(vehicles)
       # Update cache file
-      vehicles_dict = {vp.vehicle_id: vp for vp in vehicles}
-      save_to_cache(vehicles_dict)
+      prev_vehicles = load_from_cache()
+      calc_apparent_velocity(current_vehicles, prev_vehicles)
+      save_to_cache(current_vehicles)
     # Sleep
     print(f"Sleeping for {FETCH_INTERVAL} seconds...")
     time.sleep(FETCH_INTERVAL)
@@ -119,7 +133,6 @@ if __name__ == "__main__":
 #       - label (string)
 #       - license_plate (string)
 #       - wheelchair_accessible (WheelchairAccessible)
-#       - id (string)
 #     - position (Position)
 #       - latitude (float)
 #       - longitude (float)

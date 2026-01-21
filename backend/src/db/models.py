@@ -17,19 +17,11 @@ class VehiclePosition(Base):
     vehicle_id: Mapped[str]
     vehicle_label: Mapped[str]
     
-    latitude: Mapped[float | None]
-    longitude: Mapped[float | None]
+    latitude: Mapped[float]
+    longitude: Mapped[float]
     bearing: Mapped[float | None]
     odometer: Mapped[float | None]
     speed: Mapped[float | None]
 
     apparent_velocity_lat: Mapped[float | None]
     apparent_velocity_long: Mapped[float | None]
-
-# delete config options
-# - cascade_delete=True, ondelete="CASCADE"
-# - ondelete="SET NULL"
-# - passive_deletes="all", ondelete="SET NULL"
-# - passive_deletes="all", ondelete="RESTRICT"
-
-# Use a link table for many-to-many relationships

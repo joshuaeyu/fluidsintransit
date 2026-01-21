@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import src.api.live
+import src.api.history
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(src.api.live.router)
+app.include_router(src.api.history.router)
 
 # separate process for fetching
 # core server <-- database --> Uvicorn ASGI server <-- FastAPI --> frontend
