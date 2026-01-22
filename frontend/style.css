@@ -1,13 +1,36 @@
-body {
-    font-family: sans-serif;
-    background-color: rgb(224, 246, 255);
-    text-align: center;
+* {
+    margin: 0;
+    padding: 0;
 }
+
+html, body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: black;
+    color: white;
+    width: 100%;
+    height: 100%;
+}
+
+#header {
+    position: absolute;
+    margin: 8px;
+}
+#header > h2 {
+    margin-top: 0;
+}
+
 
 fieldset {
     border: none;
 }
+input[type="range"] {
+    width: 200px;
+}
 
+#canvas-container {
+    display: flex;
+}
 canvas {
-    border: 1px solid black;
+    margin-left: auto;
+    margin-right: auto;
 }

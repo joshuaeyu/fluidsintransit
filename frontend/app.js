@@ -13,8 +13,8 @@ const VehicleType = Object.freeze({
     Cableway: Symbol("cableway")
 })
 const canvas = document.getElementById("canvas");
-canvas.width = Math.min(window.innerWidth, window.innerHeight) - 150;
-canvas.height = Math.min(window.innerWidth, window.innerHeight) - 150;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 // const canvasColor = "rgba(252, 244, 209, 1)";
 // const ctx = canvas.getContext("2d");
 // Page load routine
@@ -34,6 +34,24 @@ export function calcX(longitude) {
 }
 export function calcY(latitude) {
     return 1 - (latitude - SOUTH_BORDER) / (NORTH_BORDER - SOUTH_BORDER)
+}
+export function calcAdjustedX(longitude) {
+    const x0 = calcX(longitude);
+    if (canvas.width <= canvas.height) {
+        return x0;
+    } else {
+        const offset = (canvas.width - canvas.height) / 2 / canvas.width;
+        return x0 / (canvas.width / canvas.height) + offset;
+    }
+}
+export function calcAdjustedY(latitude) {
+    const y0 = calcY(latitude);
+    if (canvas.height <= canvas.width) {
+        return y0;
+    } else {
+        const offset = (canvas.height - canvas.width) / 2 / canvas.height;
+        return y0 / (canvas.height / canvas.width) + offset;
+    }
 }
 export function radians(degrees) {
     return Math.PI * degrees / 180.0;
@@ -135,11 +153,17 @@ function draw(vehicles) {
     }
 }
 
-export async function fetchVehiclePositions() {
+export async function fetchVehiclePositions(batch_id = null) {
     // Fetch vehicle positions
     let vehicles;
     try {
-        const request = new Request("http://localhost:8000/live");
+        let url = "http://localhost:8000";
+        if (batch_id) {
+            url += `/history/batch/${batch_id}`;
+        } else {
+            url += "/live";
+        }
+        const request = new Request(url);
         const response = await fetch(request);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status} ${response.statusText}`);
@@ -150,4 +174,21 @@ export async function fetchVehiclePositions() {
     }
 
     return vehicles;
+}
+
+export async function fetchBatchIds() {
+    // Fetch batch ids
+    let batch_ids;
+    try {
+        const request = new Request("http://localhost:8000/history/all_batch_ids");
+        const response = await fetch(request);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status} ${response.statusText}`);
+        }
+        batch_ids = await response.json();
+    } catch (e) {
+        throw e;
+    }
+
+    return batch_ids;
 }

@@ -1,33 +1,60 @@
 <!-- <!DOCTYPE html> -->
 <html lang="en-US">
     <head>
-        <title>Fluids in Transit</title>
+        <title>Fluid Metro</title>
         <link rel="stylesheet" href="style.css">
         <link rel="icon" href="data:">
     </head>
     <body>
-        <h2>Hello! This is a realtime visualization of San Francisco's MUNI fleet.</h2>
-        <fieldset id="user-input">
-            <label>
-                <input type="checkbox" name="vehicletype" id="bus" value="bus" checked>
-                Buses
-            </label>
-            <label>
-                <input type="checkbox" name="vehicletype" id="metro" value="metro" checked>
-                Metro light rail
-            </label>
-            <label>
-                <input type="checkbox" name="vehicletype" id="cableway" value="cableway" checked>
-                Cable cars
-            </label>
-            <button type="button" id="refresh-btn">Update</button>
-        </fieldset>
-        <br>
-        <div id="vehicles">
-            <canvas id="canvas" width="600" height="550">
+        <div id="header">
+            <h2>San Francisco's MUNI fleet, visualized in a fluid dynamics simulation.</h2>
+            <form id="settings">
+                Playback Mode
+                <label>
+                    <input type="radio" name="playback-mode" value="live">
+                    Live
+                </label>
+                <label>
+                    <input type="radio" name="playback-mode" value="history" checked>
+                    History
+                </label>
+                <fieldset id="batch-settings">
+                    <div>
+                        Dataset
+                        <select id="batch-id"></select>
+                    </div>
+                    <div>
+                        <!-- Dataset Timeline -->
+                        <input type="range" id="timeline" min="0" value="0">
+                        <a id="timeline-label"></a>
+                    </div>
+                    <div>
+                    </div>
+                </fieldset>
+            </form>
+            <form id="user-input1">
+            </form>
+            <!-- <fieldset id="user-input3">
+                <label>
+                    <input type="checkbox" name="vehicletype" id="bus" value="bus" checked>
+                    Buses
+                </label>
+                <label>
+                    <input type="checkbox" name="vehicletype" id="metro" value="metro" checked>
+                    Metro light rail
+                </label>
+                <label>
+                    <input type="checkbox" name="vehicletype" id="cableway" value="cableway" checked>
+                    Cable cars
+                </label>
+                <button type="button" id="refresh-btn">Update</button>
+            </fieldset> -->
+        </div>
+        <div id="canvas-container">
+            <canvas id="canvas" width="100%" height="100%">
                 Vehicle positions should be plotted here.
             </canvas>
-        </div>
+        <div>
     </body>
     <script src="main.js" type="module" async></script>
     <!-- <script src="app.js" async></script> -->

@@ -16,6 +16,9 @@ CACHE_PATH: pathlib.Path = pathlib.Path(__file__).parents[2].joinpath("data/cach
 FETCH_INTERVAL: int = 10
 MAX_NUM_RECORDS: int = 1_000_000
 BATCH_ID: str
+MAX_BATCH_SIZE: int = 100_000
+
+batch_size: int = 0
 
 def fetch_vehicle_positions() -> Message:
   # HTTP GET
@@ -78,29 +81,33 @@ def init() -> None:
 
 # While running, fetch positions every FETCH_INTERVAL seconds and update database and cache
 def run() -> None:
+  global batch_size
   while True:
     # Fetch vehicle positions
     msg = fetch_vehicle_positions()
     vehicles = convert_msg_to_objects(msg)
+    
     # Update database and cache
     if vehicles:
-      current_vehicles = {}
+      prev_vehicles = load_from_cache()
+      calc_apparent_velocity(convert_list_to_dict(vehicles), prev_vehicles)
       # Update database
       with Session() as session:
         session.add_all(vehicles)
         session.commit()
-        session.refresh
-        # for vp in session.scalars(select(VehiclePosition)).all():
-        #   print(vp.__dict__)
-        count = session.execute(select(func.count(VehiclePosition.id))).scalar_one()
-        print(f"VehiclePosition database size: {count}")
-        if count > MAX_NUM_RECORDS:
-          print(f"The number of VehiclePosition records has exceeded the configured max of {MAX_NUM_RECORDS}.")
         current_vehicles = convert_list_to_dict(vehicles)
+        # Check database size
+        database_size = session.execute(select(func.count(VehiclePosition.id))).scalar_one()
+        print(f"VehiclePosition database size: {database_size}")
+        if database_size > MAX_NUM_RECORDS:
+          print(f"The number of VehiclePosition records has exceeded the configured max of {MAX_NUM_RECORDS}.")
+        # Check batch size
+        batch_size += len(vehicles)
+        if batch_size > MAX_BATCH_SIZE:
+          print(f"The number of VehiclePosition records in the current batch has exceeded the configured max of {MAX_BATCH_SIZE}.")
       # Update cache file
-      prev_vehicles = load_from_cache()
-      calc_apparent_velocity(current_vehicles, prev_vehicles)
       save_to_cache(current_vehicles)
+    
     # Sleep
     print(f"Sleeping for {FETCH_INTERVAL} seconds...")
     time.sleep(FETCH_INTERVAL)
