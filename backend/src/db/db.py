@@ -20,7 +20,5 @@ Session = sessionmaker(engine)
 
 # Create database and table
 def create_db_and_tables():
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    # with engine.connect() as connection:
-    #     connection.execute(text("PRAGMA foreign_keys=ON")) # for SQLite; allows passive_deletes to allow the database to handle deletes/updates on its own
