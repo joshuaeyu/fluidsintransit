@@ -21,10 +21,10 @@ const settings = {
     hdr: hdr,
     dt: 1,
     // Dynamic
-    diffusivity: 0.0000001,
+    diffusivity: 0.0000005,
     dissipation: 0.9,
-    viscosity: 0.0004,
-    density: 5,
+    viscosity: 0.000004,
+    density: 50,
     velocity: 5, 
 };
 
@@ -45,7 +45,6 @@ for (const field of simulationSettings) {
     });
 }
 const vehicleSettingsForm = document.getElementById("vehicle-settings");
-console.log(vehicleSettingsForm);
 const playbackSettingsForm = document.getElementById("playback-settings");
 const playbackMode = playbackSettingsForm.elements["playback-mode"];
 for (const radio of playbackMode) {
@@ -128,7 +127,6 @@ for (let i = 0; i < 10000; i++) {
             const vehicles = Object.values(dataframes)[timelineInput.value];
             const timestampFetch = Object.keys(dataframes)[timelineInput.value];
             timelineLabel.textContent = (new Date(timestampFetch * 1000)).toLocaleString("en-us", { timeZone: "America/Los_Angeles", timeZoneName: "short" });
-            console.log(vehicles);
             for (const vehicle of Object.values(vehicles)) {
                 switch (getVehicleType(vehicle)) {
                     case VehicleType.Bus:
@@ -179,7 +177,6 @@ function initSimulationSettings() {
             field.value = settings[field.name];
         }
     }
-    console.log(settings);
 }
 
 async function initUI() {
