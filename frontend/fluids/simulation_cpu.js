@@ -2,7 +2,7 @@
 
 import { webGpuContext } from "./context.js";
 
-export class SimulationCpuApp {
+export class SimulationCpu {
     settings;
     resources = {};
 
@@ -11,7 +11,7 @@ export class SimulationCpuApp {
     }
 
     static async build(settings) {
-        const app = new SimulationCpuApp(settings);
+        const app = new SimulationCpu(settings);
         app.#initSimulation();
         return app;
     }

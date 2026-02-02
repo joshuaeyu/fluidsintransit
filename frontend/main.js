@@ -3,7 +3,7 @@
 import { calcAdjustedX, calcAdjustedY, fetchBatchIds, fetchVehiclePositions, LATITUDE_SPAN, LONGITUDE_SPAN, getVehicleType, VehicleType } from "./client.js"
 import { webGpuContext } from "./fluids/context.js";
 import { RenderApp } from "./fluids/render.js";
-import { SimulationApp } from "./fluids/simulation.js";
+import { SimulationApp } from "./fluids/simulation_frag.js";
 import { delay } from "./util.js";
 
 // Simulation and rendering

@@ -2,7 +2,7 @@
 
 import { webGpuContext } from "./context.js";
 
-export class SimulationApp {
+export class SimulationFrag {
     settings;
     resources = {};
     densityOutIdx = 0;
@@ -16,7 +16,7 @@ export class SimulationApp {
     }
 
     static async build(settings) {
-        const app = new SimulationApp(settings);
+        const app = new SimulationFrag(settings);
         await app.#initSimulation();
         return app;
     }
@@ -277,22 +277,22 @@ export class SimulationApp {
             code: await fetch("./fluids/shaders/render.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const boundShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/bound.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/bound.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const sourceShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/source.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/source.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const jacobiShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/jacobi.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/jacobi.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const advectShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/advect.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/advect.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const divergenceShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/divergence.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/divergence.wgsl", {cache: "reload"}).then(r => r.text()),
         });
         const subgradShaderModule = webGpuContext.device.createShaderModule({
-            code: await fetch("./fluids/shaders/subgrad.wgsl", {cache: "reload"}).then(r => r.text()),
+            code: await fetch("./fluids/shaders/fragpute/subgrad.wgsl", {cache: "reload"}).then(r => r.text()),
         });
 
         // Main quad vertex buffer
