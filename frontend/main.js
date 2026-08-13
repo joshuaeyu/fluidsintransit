@@ -3,7 +3,8 @@
 import { calcAdjustedX, calcAdjustedY, fetchBatchIds, fetchVehiclePositions, LATITUDE_SPAN, LONGITUDE_SPAN, getVehicleType, VehicleType } from "./client.js"
 import { webGpuContext } from "./fluids/context.js";
 import { RenderApp } from "./fluids/render.js";
-import { SimulationApp } from "./fluids/simulation_frag.js";
+import { SimulationFrag } from "./fluids/simulation/frag.js";
+import { SimulationCompute } from "./fluids/simulation/compute.js";
 import { delay } from "./util.js";
 
 // Simulation and rendering
@@ -28,7 +29,8 @@ const settings = {
     velocity: 10, 
 };
 
-const simulator = await SimulationApp.build(settings);
+const simulator = await SimulationFrag.build(settings);
+// const simulator = await SimulationCompute.build(settings);
 const renderer = await RenderApp.build(settings);
 
 const densitySource = new Float32Array((settings.M+2) * (settings.N+2));

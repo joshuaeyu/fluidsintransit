@@ -1,6 +1,6 @@
 "use strict";
 
-import { webGpuContext } from "./context.js";
+import { webGpuContext } from "../context.js";
 
 export class SimulationCompute {
     
