@@ -22,7 +22,7 @@ class WebGpuContext {
             throw Error("Couldn't request WebGPU adapter.");
         }
         
-        const requiredFeatures = ["float32-filterable"];
+        const requiredFeatures = ["float32-filterable", "texture-formats-tier2"];
 
         this.device = await adapter.requestDevice({requiredFeatures});
         if (!this.device) {
