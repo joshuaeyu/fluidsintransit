@@ -19,10 +19,10 @@ def get_vehiclepositions_lastbatch() -> dict[int, list[VehiclePosition]] | None:
             if vp.timestamp_fetch not in batch_dataframe:
                 batch_dataframe[vp.timestamp_fetch] = []
             batch_dataframe[vp.timestamp_fetch].append(vp)
-        return batch_dataframe
+        return batch_dataframe # Maps timestamps to lists of vehicles
 
 @router.get("/batch/{batch_id}", response_model=None)
-def get_vehiclepositions_history(batch_id: int) -> dict[str, VehiclePosition] | None:
+def get_vehiclepositions_history(batch_id: int) -> dict[int, list[VehiclePosition]] | None:
     with Session() as session:
         statement = select(VehiclePosition).where(VehiclePosition.batch_id == batch_id).order_by(VehiclePosition.batch_id)
         vehicles = session.scalars(statement).all()
@@ -31,7 +31,7 @@ def get_vehiclepositions_history(batch_id: int) -> dict[str, VehiclePosition] | 
             if vp.timestamp_fetch not in batch_dataframe:
                 batch_dataframe[vp.timestamp_fetch] = []
             batch_dataframe[vp.timestamp_fetch].append(vp)
-        return batch_dataframe
+        return batch_dataframe # Maps timestamps to lists of vehicles
     
 @router.get("/all_batch_ids", response_model=None)
 def get_allbatchids() -> Sequence[int]:

@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/web": "^0.0.354",
+    "copyfiles-ng": "^2.4.7",
+    "typescript": "^7.0.2"
+  },
+  "scripts": {
+    "build": "tsc && npx copyfiles-ng -u 1 frontend/*.html frontend/*.css frontend/dist && copyfiles-ng -u 2 frontend/src/**/*.wgsl frontend/dist",
+    "clean": "rm -r frontend/dist",
+    "backend": "source .venv/bin/activate; fastapi run backend/src/main.py --port 8000",
+    "frontend": "source .venv/bin/activate; python -m http.server --directory frontend/dist 8001"
+  },
+  "type": "module"
+}

@@ -5,7 +5,7 @@ struct VertexOut {
 }
 
 @vertex
-fn vertex_main (
+fn vertex_main(
     @location(0) position: vec4f,
     @location(1) uv: vec2f
 ) -> VertexOut {
@@ -14,7 +14,7 @@ fn vertex_main (
 
 // Fragment shader
 @group(0) @binding(0) var output_sampler: sampler;
-@group(0) @binding(1) var output_map: texture_2d<f32>;
+@group(1) @binding(0) var output_map: texture_2d<f32>;
 
 const max_val = 1.0;
 const fracs = vec4f(0.1, 0.6, 0.3, 0);
