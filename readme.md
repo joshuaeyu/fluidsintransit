@@ -65,10 +65,10 @@ Launch the FastAPI **API server** on port 8000.
 npm run backend # See package.json for script details
 ```
 
-In another shell instance, launch an **HTTP server** on port 8001 at the `frontend/` directory. Open [http://localhost:8001](http://localhost:8001) in a web browser.
+In another shell instance, launch an **HTTP server** on port 8001 at the `frontend/dist/` directory. Open [http://localhost:8001](http://localhost:8001) in a web browser.
 
 ```shell
-npm run backend # See package.json for script details
+npm run frontend # See package.json for script details
 ```
 
 *Optionally*, in a third shell instance, launch the **fetcher process** to fetch live vehicle position information from the [511 Open Data API](https://511.org/open-data/transit).
