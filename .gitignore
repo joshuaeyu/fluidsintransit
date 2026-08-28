@@ -1,7 +1,18 @@
+# cache
 __pycache__
-.vscode
 .DS_Store
 
+# local settings
+.vscode
 .venv
 
+# private folders
 private
+ignore
+backend/data
+
+# node
+node_modules
+
+# compiled ts
+frontend/dist

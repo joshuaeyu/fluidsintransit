@@ -1,6 +1,6 @@
 # San Francisco's MUNI fleet, visualized in a WebGPU fluid dynamics simulation
 
-![Screenshot of fluid simulation](images/fluidmetro-screenshot.png)
+![Screenshot of fluid simulation](docs/images/fluidmetro-screenshot.png)
 
 This is a GPU-accelerated web browser implementation of Jos Stam's real-time fluid dynamics solver originally presented in his seminal paper "Stable Fluids" from 1999. This project additionally includes a light backend which provides live and historical vehicle positions of San Francisco's MUNI (public transit) fleet to the frontend fluid simuation. Together, these create a fun way to visualize real-world data (and a rewarding way for me to learn the basics of web development, a new graphics API, and GPGPU)!
 
@@ -16,8 +16,8 @@ This is a GPU-accelerated web browser implementation of Jos Stam's real-time flu
 
 ### Frontend
 
-- **JavaScript + HTML + CSS**: Provide user controls and make requests to the backend API.
-- **JavaScript + WebGPU**: Simulate and render the fluid simulation.
+- **TypeScript + HTML + CSS**: Provide user controls and make requests to the backend API.
+- **TypeScript + WebGPU**: Simulate and render the fluid simulation.
   
 ### Backend
 
@@ -29,9 +29,10 @@ This is a GPU-accelerated web browser implementation of Jos Stam's real-time flu
 ### Requirements
 
 - Python 3.13 or higher
+- [Node.js](https://nodejs.org/en)
 - [Browser with WebGPU support](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API#browser_compatibility)
 
-### Run the Simulation
+### Setup
 
 Install the Python packages listed in `requirements.txt` (ideally within a [venv](https://docs.python.org/3/library/venv.html) or [conda](https://docs.conda.io/en/latest/) environment).
 
@@ -44,16 +45,30 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Install the Node.js packages listed in `package-lock.json`.
+
+```shell
+npm install
+```
+
+Compile TypeScript into JavaScript.
+
+```shell
+npm run build # See package.json for script details
+```
+
+### Running the Application
+
 Launch the FastAPI **API server** on port 8000.
 
 ```shell
-fastapi run backend/main.py --port 8000
+npm run backend # See package.json for script details
 ```
 
 In another shell instance, launch an **HTTP server** on port 8001 at the `frontend/` directory. Open [http://localhost:8001](http://localhost:8001) in a web browser.
 
 ```shell
-python -m http.server --directory frontend 8001
+npm run backend # See package.json for script details
 ```
 
 *Optionally*, in a third shell instance, launch the **fetcher process** to fetch live vehicle position information from the [511 Open Data API](https://511.org/open-data/transit).

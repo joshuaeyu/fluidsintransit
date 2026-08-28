@@ -1,12 +1,7 @@
-"use strict";
+import type { Vehicle, VehicleBatch, VehicleType } from "../types/vehicle.js";
 
 // Document elements
-export const VehicleType = Object.freeze({
-    Bus: Symbol("bus"),
-    Metro: Symbol("metro"),
-    Cableway: Symbol("cableway")
-})
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // San Francisco border coordinates
 const NORTH_BORDER = 37.833;
@@ -19,13 +14,13 @@ export const LATITUDE_SPAN = EAST_BORDER - WEST_BORDER;
 // export const milesPerDegreeLongitude = 69.00;
 
 // Coordinate functions
-export function calcX(longitude) {
+export function calcX(longitude: number): number {
     return (longitude - WEST_BORDER) / (EAST_BORDER - WEST_BORDER)
 }
-export function calcY(latitude) {
+export function calcY(latitude: number): number {
     return 1 - (latitude - SOUTH_BORDER) / (NORTH_BORDER - SOUTH_BORDER)
 }
-export function calcAdjustedX(longitude) {
+export function calcAdjustedX(longitude: number): number {
     const x0 = calcX(longitude);
     if (canvas.width <= canvas.height) {
         return x0;
@@ -34,7 +29,7 @@ export function calcAdjustedX(longitude) {
         return x0 / (canvas.width / canvas.height) + offset;
     }
 }
-export function calcAdjustedY(latitude) {
+export function calcAdjustedY(latitude: number): number {
     const y0 = calcY(latitude);
     if (canvas.height <= canvas.width) {
         return y0;
@@ -45,21 +40,21 @@ export function calcAdjustedY(latitude) {
 }
 
 // Vehicle functions
-export function getVehicleType(vehicle) {
-    if (['CA', 'PH', 'PM'].indexOf(vehicle.route_id) !== -1) {
-        return VehicleType.Cableway;
-    } else if (isAlpha(vehicle.route_id[0])) {
-        return VehicleType.Metro;
+export function getVehicleType(vehicle: Vehicle): VehicleType {
+    if (['CA', 'PH', 'PM'].indexOf(vehicle.route_id as string) !== -1) {
+        return "Cableway";
+    } else if (isAlpha((vehicle.route_id as string)[0] as string)) {
+        return "Metro";
     } else {
-        return VehicleType.Bus;
+        return "Bus";
     }
 }
-function isAlpha(char) {
+function isAlpha(char: string): boolean {
     return /^[A-Z]/.test(char);
 }
 
 // API calls
-export async function fetchBatchIds() {
+export async function fetchBatchIds(): Promise<string[]> {
     // Fetch batch ids
     let batch_ids;
     try {
@@ -76,7 +71,10 @@ export async function fetchBatchIds() {
     return batch_ids;
 }
 
-export async function fetchVehiclePositions(batch_id = null) {
+export async function fetchVehiclePositions(batch_id: number): Promise<VehicleBatch>;
+export async function fetchVehiclePositions(): Promise<Vehicle[]>;
+
+export async function fetchVehiclePositions(batch_id: number | null = null): Promise<VehicleBatch | Vehicle[]> {
     // Fetch vehicle positions
     let vehicles;
     try {

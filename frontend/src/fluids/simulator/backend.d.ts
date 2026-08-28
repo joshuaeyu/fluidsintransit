@@ -1,0 +1,1 @@
+export type SimulatorBackend = "compute" | "frag" | "cpu";
